@@ -342,6 +342,116 @@ public class Mapa {
     }
     
     public String checkCercania(Posicion posActual, int rango,AgentID aid, boolean fly){
+        //NOrte sumas Y, Este Sumas X
+         // Miramos Norte
+         
+         String mov =Movs.MOV_E;
+        int x=posActual.x;
+        int y=posActual.y;
+        Posicion posAux= new Posicion(posActual);
+        int puntosN=0;
+        int puntosNE=0;
+        int puntosNW=0;
+        int puntosE=0;
+        int puntosW=0;
+        int puntosSE=0;
+        int puntosSW=0;
+        int puntosS=0;
+        
+        int [] puntos = new int[8];
+        //Miramos norte
+        for(int i=0; i<rango+5; i++){
+             if(get(x,y-i)==CELDA_LIBRE){
+                puntosN++;
+            }
+            else if(get(x,y-i)==DESCONOCIDO){
+                puntosN=puntosN+10;
+            }
+            else if(checkObstaculo(new Posicion(x,y-i), fly)){
+                puntosN=puntosN-1000;
+            }
+        }
+        
+        for(int i=0; i<rango+5; i++){
+            if(get(x+i,y-i)==CELDA_LIBRE){
+               puntosNE++;
+           }
+           else if(get(x+i,y-i)==DESCONOCIDO){
+               puntosNE=puntosNE+10;
+           }
+           else if(checkObstaculo(new Posicion(x+i,y-i), fly)){
+               puntosNE=puntosNE-1000;
+           }
+        }
+         for(int i=0; i<rango+5; i++){
+            if(get(x-i,y-i)==CELDA_LIBRE){
+               puntosNW++;
+           }
+           else if(get(x-i,y-i)==DESCONOCIDO){
+               puntosNW=puntosNW+10;
+           }
+           else if(checkObstaculo(new Posicion(x-i,y-i), fly)){
+               puntosNW=puntosNW-1000;
+           }
+        }
+        
+        for(int i=0; i<rango+5; i++){
+             if(get(x,y-i)==CELDA_LIBRE){
+                puntosS++;
+            }
+            else if(get(x,y-i)==DESCONOCIDO){
+                puntosS=puntosS+10;
+            }
+            else if(checkObstaculo(new Posicion(x,y+i), fly)){
+                puntosS=puntosS-1000;
+            }
+        }
+        for(int i=0; i<rango+5; i++){
+             if(get(x+i,y)==CELDA_LIBRE){
+                puntosE++;
+            }
+            else if(get(x+i,y)==DESCONOCIDO ){
+                puntosE=puntosE+10;
+            }
+            else if(checkObstaculo(new Posicion(x+i,y), fly)){
+                puntosE=puntosE-1000;
+            }
+        }
+         for(int i=0; i<rango+5; i++){
+             if(get(x-i,y)==CELDA_LIBRE){
+                puntosW++;
+            }
+            else if(get(x-i,y)==DESCONOCIDO ){
+                puntosW=puntosW+10;
+            }
+            else if(checkObstaculo(new Posicion(x+i,y), fly)){
+                puntosW= puntosW-1000;
+            }
+        }
+         
+         if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW){
+             mov=Movs.MOV_S;
+         }
+         else if(puntosN>puntosS && puntosN> puntosE && puntosN > puntosW){
+             mov=Movs.MOV_N;
+         }
+          else if(puntosE>puntosS && puntosE> puntosN && puntosE > puntosW){
+             mov=Movs.MOV_E;
+         }
+         else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
+             mov=Movs.MOV_W;
+         }
+         
+             
+       
+        
+        
+        
+        
+        return mov;
+            
+           
+        /*
         int maxDesconocidas = -1;
         String mov = Movs.MOV_NW;
         int offset = 1;
@@ -390,7 +500,7 @@ public class Mapa {
         }
         
         return mov;
-        
+        */
     }
     
     /*
