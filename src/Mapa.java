@@ -399,16 +399,40 @@ public class Mapa {
         }
         
         for(int i=0; i<rango+5; i++){
-             if(get(x,y-i)==CELDA_LIBRE){
+             if(get(x,y+i)==CELDA_LIBRE){
                 puntosS++;
             }
-            else if(get(x,y-i)==DESCONOCIDO){
+            else if(get(x,y+i)==DESCONOCIDO){
                 puntosS=puntosS+10;
             }
             else if(checkObstaculo(new Posicion(x,y+i), fly)){
                 puntosS=puntosS-1000;
             }
         }
+        
+         for(int i=0; i<rango+5; i++){
+            if(get(x+i,y+i)==CELDA_LIBRE){
+               puntosSE++;
+           }
+           else if(get(x+i,y+i)==DESCONOCIDO){
+               puntosSE=puntosSE+10;
+           }
+           else if(checkObstaculo(new Posicion(x+i,y+i), fly)){
+               puntosSE=puntosSE-1000;
+           }
+        }
+         for(int i=0; i<rango+5; i++){
+            if(get(x-i,y+i)==CELDA_LIBRE){
+               puntosSW++;
+           }
+           else if(get(x-i,y+i)==DESCONOCIDO){
+               puntosSW=puntosSW+10;
+           }
+           else if(checkObstaculo(new Posicion(x-i,y+i), fly)){
+               puntosSW=puntosSW-1000;
+           }
+        }
+        
         for(int i=0; i<rango+5; i++){
              if(get(x+i,y)==CELDA_LIBRE){
                 puntosE++;
@@ -432,7 +456,7 @@ public class Mapa {
             }
         }
          
-         if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW){
+         if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW ){
              mov=Movs.MOV_S;
          }
          else if(puntosN>puntosS && puntosN> puntosE && puntosN > puntosW){
@@ -440,6 +464,9 @@ public class Mapa {
          }
           else if(puntosE>puntosS && puntosE> puntosN && puntosE > puntosW){
              mov=Movs.MOV_E;
+         }
+         else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
+             mov=Movs.MOV_W;
          }
          else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
              mov=Movs.MOV_W;
