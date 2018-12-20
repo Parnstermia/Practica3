@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) {
         Administrador admin;
-        String jefe = "MasterM";
+        String jefe = "MasterMind";
         String subdito = "peasant-";
         
         ////////////////////////////////////////////
@@ -45,7 +45,7 @@ public class Main {
             admin.start();
 
         } catch (Exception ex) {
-            System.err.println("Error creando agentes");
+            System.err.println(ex.toString());
             System.exit(1);
         }
     }

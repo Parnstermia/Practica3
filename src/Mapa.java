@@ -29,6 +29,7 @@ public class Mapa {
     
     private HashMap<String, Posicion> vehiculos;
     private HashMap<String, Integer> valor_en_Mapa;
+    private HashMap<String, Boolean> necesita_percepcion;
     
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
@@ -39,6 +40,10 @@ public class Mapa {
             }
         }
         vehiculos = new HashMap<>();
+        necesita_percepcion = new HashMap<>();
+        for(int i = 0; i < aids.size(); i++ ){
+            necesita_percepcion.put(aids.get(i).getLocalName(), true);
+        }
         setValoresAgentes(aids);
         bateriaGlobal = 10000;
     }
@@ -353,7 +358,7 @@ public class Mapa {
         //NOrte sumas Y, Este Sumas X
          // Miramos Norte
          
-         String mov =Movs.MOV_E;
+        String mov =Movs.MOV_E;
         int x=posActual.x;
         int y=posActual.y;
         Posicion posAux= new Posicion(posActual);
@@ -467,34 +472,35 @@ public class Mapa {
             }
         }
 
-         
-         if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW ){
-             mov=Movs.MOV_S;
-         }
-         else if(puntosN>puntosS && puntosN> puntosE && puntosN > puntosW){
-             mov=Movs.MOV_N;
-         }
-          else if(puntosE>puntosS && puntosE> puntosN && puntosE > puntosW){
-             mov=Movs.MOV_E;
-         }
-         else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
-             mov=Movs.MOV_W;
-         }
-       
-             
-
-        puntos[5] = puntosW;
+        puntos[3] = puntosW;
         
         puntos[4] = 0;
         
         int max = 0;
-        for(int i =0 ; i < 8; i ++){
+        for(int i =0 ; i < 9; i ++){
             if(puntos[i] > puntos[max]){
                 max = i;
             }
         }
-        
-        mov = Movs.intToString(max);
+        if( necesita_percepcion.get(aid.getLocalName()) ){
+            mov = Movs.PERCEIVE;
+            necesita_percepcion.put(aid.getLocalName(), false);
+        }else{
+            mov = Movs.intToString(max);
+            while( checkObstaculo(siguientePosicion(posActual, mov),fly) ){
+                
+                puntos[max] = -1111111;
+                max = 0;
+                for(int i =0 ; i < 9; i ++){
+                    if(puntos[i] > puntos[max]){
+                        max = i;
+                    }
+                }
+                
+            }
+            mov = Movs.intToString(max);
+            necesita_percepcion.put(aid.getLocalName(), true);
+        }
         
         return mov;
             

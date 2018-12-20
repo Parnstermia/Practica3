@@ -161,7 +161,7 @@ public class Administrador extends SingleAgent{
                             //Thread.sleep(1000);
                         
                             // borrar luego
-                            if(contador >= 500){
+                            if(contador >= 60){
                                 System.out.println("No se ha encontrado el objetivo");
                                 estado = ESTADO_FIN;
                             }
