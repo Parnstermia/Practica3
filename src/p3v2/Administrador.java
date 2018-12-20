@@ -29,8 +29,8 @@ public class Administrador extends SingleAgent{
     private static final int ESTADO_ERROR = -1;
     
     private ArrayList<AgentID> agentes;
-    private HashMap<AgentID,Integer> baterias;
-    private HashMap<AgentID,String> tipos;
+    private HashMap<String,Integer> baterias;
+    private HashMap<String,String> tipos;
     private Mapa mapa;
     private String nivel;
     private String host;
@@ -61,8 +61,9 @@ public class Administrador extends SingleAgent{
         baterias = new HashMap<>();
         tipos = new HashMap<>();
         for(AgentID agente: aids){
-            baterias.put(agente, 0);
+            baterias.put(agente.getLocalName(), 0);
         }
+        System.out.println(baterias.size());
         estado = ESTADO_SUBSCRIPCION;
         //estado = ESTADO_FIN;
         mapa = new Mapa( 500 ,aids);
@@ -118,9 +119,9 @@ public class Administrador extends SingleAgent{
                     for(int i = 0; i < agentes.size(); i++){
                         contador++; // borrar luego
                         agente = agentes.get(i);
-                        tipo = tipos.get(agente);
-                        System.out.println(agente.getLocalName() + ", bateria :" + baterias.get(agente));
-                        if(baterias.get(agente) < 3){
+                        tipo = tipos.get(agente.getLocalName());
+                        System.out.println(agente.getLocalName() + ", bateria :" + baterias.get(agente.getLocalName()));
+                        if(baterias.get(agente.getLocalName()) < 3){
                             objeto = new JsonObject();
                             
                             
@@ -135,13 +136,17 @@ public class Administrador extends SingleAgent{
                             performative = ACLMessage.REQUEST;
                             enviarMensaje(objeto, agente, performative, null);
                             
+                            if(movimiento.equals(Movs.REFUEL)){
+                                recibirMensaje();
+                            }
+                            
                         }else{
                             objeto = new JsonObject();
                             
                             movimiento = mapa.elegirMovimiento(agente, tipo);
+                            System.out.println(movimiento);
                             objeto.add("orden", movimiento);
                             performative = ACLMessage.REQUEST;
-                            
                             enviarMensaje(objeto, agente, performative, null);
                             
                         }
@@ -149,10 +154,10 @@ public class Administrador extends SingleAgent{
                             recibirMensaje();
                         }
                         try{
-                            Thread.sleep(2000);
+                            Thread.sleep(1000);
                         
                             // borrar luego
-                            if(contador >= 20){
+                            if(contador >= 30){
                                 estado = ESTADO_FIN;
                             }
                         
@@ -164,8 +169,8 @@ public class Administrador extends SingleAgent{
                 case ESTADO_ENCONTRADO:
                     for(int i = 0; i < agentes.size(); i++){
                         agente = agentes.get(i);
-                        tipo = tipos.get(agente);
-                        if(baterias.get(agente) < 3){
+                        tipo = tipos.get(agente.getLocalName());
+                        if(baterias.get(agente.getLocalName()) < 3){
                             objeto = new JsonObject();
                             
                             if( mapa.checkRefuel())
@@ -178,6 +183,10 @@ public class Administrador extends SingleAgent{
                             performative = ACLMessage.REQUEST;
                             
                             enviarMensaje(objeto, agente, performative, null);
+                            
+                             if(movimiento.equals(Movs.REFUEL)){
+                                recibirMensaje();
+                            }
                             
                         }else{
                             objeto = new JsonObject();
@@ -238,13 +247,18 @@ public class Administrador extends SingleAgent{
                         else
                             tipo = vehiculo.TIPO_COCHE;
 
-                    tipos.put(inbox.getSender(), tipo);
+                    tipos.put(inbox.getSender().getLocalName(), tipo);
                     
                     System.out.println("Tipo asignado: " + tipo);
                 }else if ( json.get("orden").asString().equals(Movs.PERCEIVE)){
                     
                     mapa.updateMap(inbox.getSender(), json);
                     
+                }else if ( json.get("orden").asString().equals(Movs.REFUEL) ){
+                    System.out.println("Refuel confirmado"); // borrar
+                    
+                    baterias.put(inbox.getSender().getLocalName(), 100);
+                
                 }
             }else if( json.get("result") != null){
                 System.out.println("Recibo el converID");

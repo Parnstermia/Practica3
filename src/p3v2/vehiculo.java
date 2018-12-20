@@ -9,6 +9,7 @@ package p3v2;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import es.upv.dsic.gti_ia.core.ACLMessage;
 import es.upv.dsic.gti_ia.core.AgentID;
 import es.upv.dsic.gti_ia.core.SingleAgent;
@@ -59,7 +60,8 @@ public class vehiculo extends SingleAgent{
         ACLMessage outbox = new ACLMessage();
         outbox.setSender(this.getAid());
         outbox.setReceiver(receiver);
-        outbox.setContent(objeto.toString());
+        if( objeto != null)
+            outbox.setContent(objeto.toString());
         if( conversationID != null)
             outbox.setConversationId(conversationID);
         if( inReplyTo != null)
@@ -90,11 +92,20 @@ public void gestionarInformes(ACLMessage inbox){
             
             
         }else{
-            JsonObject json2 = obj.get("result").asObject();
-            if(json2.get("battery")!= null){
-                json2.add("orden", Movs.PERCEIVE);
+            JsonValue val = obj.get("result");
+            if ( val.isString() ){
+                System.out.println("refuel realizado");
+                obj.add("orden", Movs.REFUEL);
                 performative = ACLMessage.INFORM;
-                enviarMensaje(json2, mastermind, performative, conversationID, null);
+                enviarMensaje(obj, mastermind, performative, conversationID, null);
+            }else if ( val.isObject() ){
+                JsonObject json2 = obj.get("result").asObject();
+                if(json2.get("battery")!= null){
+                    json2.add("orden", Movs.PERCEIVE);
+                    performative = ACLMessage.INFORM;
+                    System.out.println("enviando percepcion percepcion?");
+                    enviarMensaje(json2, mastermind, performative, conversationID, null);
+                }
             }
         }
         
@@ -162,9 +173,11 @@ public void gestionarInformes(ACLMessage inbox){
                 break;
             
             case Movs.PERCEIVE:
-                obj = new JsonObject();;
+                obj = new JsonObject();
                 performative = ACLMessage.QUERY_REF;
-                
+                System.out.println("mensaje: " + obj.toString());
+                System.out.println("conv: " + conversationID);
+                System.out.println("replywith: " + inReplyTo);
                 enviarMensaje(obj, host, performative, conversationID, inReplyTo);
                 break;
             
@@ -196,7 +209,11 @@ public void gestionarInformes(ACLMessage inbox){
         ACLMessage inbox;
         try {
             inbox = receiveACLMessage();
-            System.out.println(miID.getLocalName() + " recibe el mensaje con performativa " + inbox.getPerformative());
+            System.out.println(miID.getLocalName() + " recibe el mensaje con performativa " + inbox.getPerformative() + ", de " + inbox.getSender().getLocalName());
+            if(inbox.getSender().getLocalName().equals(host.getLocalName())){
+                System.out.println("replywith: " + inReplyTo);
+                inReplyTo = inbox.getReplyWith();
+            }
             int performative = inbox.getPerformativeInt();
             
             switch(performative){
@@ -222,12 +239,10 @@ public void gestionarInformes(ACLMessage inbox){
                     
                     break;
                 case ACLMessage.NOT_UNDERSTOOD:
-                    System.out.println("Not understood");
                     System.out.println(inbox.getContent().toString());
                     exito = false;
                     break;
                 case ACLMessage.FAILURE:
-                    System.out.println("Failure");
                     System.out.println(inbox.getContent().toString());
                     exito = false;
                     break;

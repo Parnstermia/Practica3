@@ -32,8 +32,8 @@ public class Mapa {
     private boolean finalEncontrado;
     Posicion objetivo;
     
-    private HashMap<AgentID, Posicion> vehiculos;
-    private HashMap<AgentID, Integer> valor_en_Mapa;
+    private HashMap<String, Posicion> vehiculos;
+    private HashMap<String, Integer> valor_en_Mapa;
     
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
@@ -49,7 +49,8 @@ public class Mapa {
         int i = 7;
         valor_en_Mapa = new HashMap<>();
         for(AgentID aid: aids){
-            valor_en_Mapa.put(aid, i);
+            valor_en_Mapa.put(aid.getLocalName(), i);
+            vehiculos.put(aid.getLocalName(), new Posicion(20,20));
             i++;
         }
     }
@@ -189,7 +190,7 @@ public class Mapa {
     }
 
     public Posicion getPosicionVehiculo(AgentID aid){
-        return vehiculos.get(aid);
+        return vehiculos.get(aid.getLocalName());
     }
     
     public int getBateriaGlobal(){
@@ -199,12 +200,12 @@ public class Mapa {
     // return bateria del vehiculo con AgentID aid
     public boolean updateMap(AgentID aid, JsonObject percepcion){
         Posicion posActual = new Posicion();
-        boolean objetivo = false;
+        boolean objetivo_encontrado = false;
         
        
         //Posición del agente. 
-        if( vehiculos.containsKey(aid)){
-            posActual = vehiculos.get(aid);
+        if( vehiculos.containsKey(aid.getLocalName())){
+            posActual = vehiculos.get(aid.getLocalName());
         }
         
         if(percepcion.get("gps") != null){
@@ -212,7 +213,7 @@ public class Mapa {
             x = percepcion.get("gps").asObject().get("x").asInt();
             y = percepcion.get("gps").asObject().get("y").asInt();
             posActual = new Posicion(x,y);
-            vehiculos.put(aid, posActual);
+            vehiculos.put(aid.getLocalName(), posActual);
         }
         
         if(percepcion.get("radar") != null){
@@ -250,8 +251,8 @@ public class Mapa {
         }
         
         if ( percepcion.get("objetivo") != null){
-            objetivo = percepcion.get("objetivo").asBoolean();
-            if(objetivo){
+            objetivo_encontrado = percepcion.get("objetivo").asBoolean();
+            if(objetivo_encontrado){
                 finalEncontrado = true;
             }
         }
@@ -260,7 +261,7 @@ public class Mapa {
             int bateriaCoche = percepcion.get("bateria").asInt();
         }
         
-        return objetivo;
+        return objetivo_encontrado;
     }
     
     public JsonObject toJson(){
@@ -324,30 +325,34 @@ public class Mapa {
     public String elegirMovimiento(AgentID aid, String tipo){
         String movimiento = Movs.ESPERA;
         
-        Posicion posActual = new Posicion(vehiculos.get(aid));
-        
-        if(!finalEncontrado){       //Exploración
-            switch(tipo){
-                case vehiculo.TIPO_VOLADOR:
-                    movimiento = checkCercania(posActual, 3);
-                    break;
-                case vehiculo.TIPO_COCHE:
-                    movimiento = checkCercania(posActual, 7);
-                    
-                    break;
-                case vehiculo.TIPO_CAMION:
-                    movimiento = checkCercania(posActual, 11);
-                    
-                    break;
+        if( vehiculos.containsKey(aid.getLocalName())){
+            Posicion posActual = new Posicion(vehiculos.get(aid.getLocalName()));
+
+            if(!finalEncontrado){       //Exploración
+                switch(tipo){
+                    case vehiculo.TIPO_VOLADOR:
+                        movimiento = checkCercania(posActual, 3);
+                        break;
+                    case vehiculo.TIPO_COCHE:
+                        movimiento = checkCercania(posActual, 7);
+
+                        break;
+                    case vehiculo.TIPO_CAMION:
+                        movimiento = checkCercania(posActual, 11);
+
+                        break;
+                }
+            }else{                      //Greedy hasta el objetivo
+                movimiento = toObjective(posActual, aid);
             }
-        }else{                      //Greedy hasta el objetivo
-            movimiento = toObjective(posActual, aid);
+            Posicion sig = siguientePosicion(posActual, movimiento);
+
+            System.out.println("Agente : " + aid.getLocalName() + ", movimiento: " + movimiento);
+
+            vehiculos.put(aid.getLocalName() ,sig);
+        }else{
+            movimiento = Movs.PERCEIVE;
         }
-        Posicion sig = siguientePosicion(posActual, movimiento);
-        
-        System.out.println("Agente : " + aid.getLocalName() + ", movimiento: " + movimiento);
-        
-        vehiculos.put(aid, sig);
         return movimiento;
     }
     
@@ -357,7 +362,7 @@ public class Mapa {
     }
     
     public boolean checkVisitada(Posicion pos, AgentID id){
-        return (get(pos.x, pos.y) == valor_en_Mapa.get(id));
+        return (get(pos.x, pos.y) == valor_en_Mapa.get(id.getLocalName()));
     }
     
     public String toObjective(Posicion posActual, AgentID id){
@@ -398,6 +403,7 @@ public class Mapa {
         
         return mov;
     }
+    
     
     public String checkCercania(Posicion posActual, int rango){
         int maxDesconocidas = -1;

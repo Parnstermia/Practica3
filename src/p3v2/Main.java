@@ -17,8 +17,8 @@ public class Main {
     public static void main(String[] args) {
         Administrador admin;
         BasicConfigurator.configure();
-        String jefe = "MasterMind1";
-        String subdito = "peasant2-";
+        String jefe = "MasterMind";
+        String subdito = "peasant-";
         
         ////////////////////////////////////////////
         // No hacer push a los datos del grupo
