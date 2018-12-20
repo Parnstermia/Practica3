@@ -81,6 +81,7 @@ public class Administrador extends SingleAgent{
         while(ejecutar){
             switch(estado){
                 case ESTADO_SUBSCRIPCION:
+                    
                     objeto = new JsonObject();
                     objeto.add("world", nivel);
                     performative = ACLMessage.SUBSCRIBE;
@@ -122,9 +123,10 @@ public class Administrador extends SingleAgent{
                         agente = agentes.get(i);
                         tipo = tipos.get(agente.getLocalName());
                         System.out.println(agente.getLocalName() + ", bateria :" + baterias.get(agente.getLocalName()));
-                        if(baterias.get(agente.getLocalName()) < 3){
+                        
+                        if(baterias.get(agente.getLocalName()).intValue() < 5){
                             objeto = new JsonObject();
-                            
+                            System.out.println("RECARGAMOS");
                             
                             if( mapa.checkRefuel())
                                 movimiento = Movs.REFUEL;
@@ -147,7 +149,7 @@ public class Administrador extends SingleAgent{
                             movimiento = mapa.elegirMovimiento(agente, tipo);
                             System.out.println(movimiento);
                             if(!movimiento.equals(Movs.ESPERA) && !movimiento.equals(Movs.PERCEIVE)){
-                                baterias.put(agente.getLocalName(), baterias.get(agente.getLocalName())-1);
+                                baterias.put(agente.getLocalName(), baterias.get(agente.getLocalName()).intValue()-1);
                             }
                             objeto.add("orden", movimiento);
                             performative = ACLMessage.REQUEST;
@@ -158,10 +160,10 @@ public class Administrador extends SingleAgent{
                             recibirMensaje();
                         }
                         try{
-                            //Thread.sleep(1000);
+                            Thread.sleep(200);
                         
                             // borrar luego
-                            if(contador >= 60){
+                            if(contador >= 2000){
                                 System.out.println("No se ha encontrado el objetivo");
                                 estado = ESTADO_FIN;
                             }
@@ -219,6 +221,10 @@ public class Administrador extends SingleAgent{
                     
                     recibirMensaje(); //agree
                     recibirMensaje(); //trace
+                    recibirMensaje();
+                    recibirMensaje();
+                    recibirMensaje();
+                    recibirMensaje();
                     ejecutar=false;
                     
                     break;

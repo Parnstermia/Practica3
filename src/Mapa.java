@@ -31,6 +31,8 @@ public class Mapa {
     private HashMap<String, Integer> valor_en_Mapa;
     private HashMap<String, Boolean> necesita_percepcion;
     
+    private int incrementarRango = 0;
+    
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
         matriz = new int[miDimension][miDimension];
@@ -262,6 +264,8 @@ public class Mapa {
             System.out.println("Agente : " + aid.getLocalName() + ", movimiento: " + movimiento + posActual);
 
             vehiculos.put(aid.getLocalName() ,sig);
+            set(sig, VEHICULO);
+            set(posActual, CELDA_LIBRE);
         }else{
             movimiento = Movs.PERCEIVE;
         }
@@ -278,7 +282,9 @@ public class Mapa {
     public boolean checkObstaculo(Posicion pos, boolean fly){
         int value = get(pos);
         boolean no_pasable = ( value == BORDE_DEL_MUNDO || value == VEHICULO);
-        
+        if(pos.x < 0 || pos.y < 0 || pos.x > 100 || pos.y > 100){
+            return true;
+        }
         if(fly)
             return no_pasable;
         else
