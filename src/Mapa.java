@@ -335,6 +335,36 @@ public class Mapa {
     }
     
     public String checkCercania(Posicion posActual, int rango,AgentID aid, boolean fly){
+        //NOrte sumas Y, Este Sumas X
+         // Miramos Norte
+        int x=posActual.x;
+        int y=posActual.y;
+        Posicion posAux= new Posicion(posActual);
+        int puntosN=0;
+        int puntosNE=0;
+        int puntosNW=0;
+        int puntosE=0;
+        int puntosW=0;
+        int puntosSE=0;
+        int puntosSW=0;
+        
+        //Miramos norte
+        for(int i=0; i<rango; i++){
+             if(get(x,y+i)==CELDA_LIBRE){
+                puntosN++;
+            }
+            else if(get(x,y+i)==DESCONOCIDO){
+                puntosN=puntosN+10;
+            }
+            else if(get(x,y+i)==OBSTACULO){
+                puntosN=-1000;
+            }
+        }
+       
+        
+            
+           
+        /*
         int maxDesconocidas = -1;
         String mov = Movs.MOV_NW;
         int offset = 1;
@@ -383,7 +413,7 @@ public class Mapa {
         }
         
         return mov;
-        
+        */
     }
     private int casillasPorDescubrir(Posicion posActual, int rango){
         int casillasDesconocidas = 0;
