@@ -535,35 +535,5 @@ public class Mapa {
         hash = 59 * hash + this.miDimension;
         return hash;
     }
-    public class ValorRLE{
-        public int valor;
-        public int veces;
-        
-        public ValorRLE(int c, int v){
-            valor = c;
-            veces = v;
-        }
-        
-        @Override
-        public boolean equals(Object obj){
-            if (obj == null)
-                return false;
-            if (obj == this)
-                return true;
-            if (!(obj instanceof ValorRLE))
-                return false;
-            ValorRLE other = (ValorRLE)obj;
-            return other.valor == valor && 
-                   other.veces == veces;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 23 * hash + this.valor;
-            hash = 23 * hash + this.veces;
-            return hash;
-        }
-    }
-
+    
 }

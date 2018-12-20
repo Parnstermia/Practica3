@@ -24,8 +24,8 @@ public class Movs {
     public static final int INT_MOV_SE = 8;
     public static final int INT_MOV_S = 7;
     public static final int INT_MOV_SW = 6;
-    public static final int INT_MOV_W = 4;
-    public static final int INT_MOV_NW = 3;
+    public static final int INT_MOV_W = 3;
+    public static final int INT_MOV_NW = 0;
     
     public static final String ESPERA = "moveN";
     public static final String REFUEL = "refuel";
