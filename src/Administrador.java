@@ -64,7 +64,7 @@ public class Administrador extends SingleAgent{
         for(AgentID agente: aids){
             baterias.put(agente.getLocalName(), 0);
         }
-        System.out.println(baterias.size());
+        
         estado = ESTADO_SUBSCRIPCION;
         //estado = ESTADO_FIN;
         mapa = new Mapa( 500 ,aids);

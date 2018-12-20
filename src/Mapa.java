@@ -6,8 +6,6 @@ import es.upv.dsic.gti_ia.core.AgentID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Collection;
 import java.util.Stack;
 
 /**
@@ -35,7 +33,11 @@ public class Mapa {
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
         matriz = new int[miDimension][miDimension];
-        Arrays.fill(matriz, DESCONOCIDO);
+        for(int i = 0; i < miDimension; i++){
+            for (int j = 0; j < miDimension; j++){
+                matriz[i][j] = DESCONOCIDO;
+            }
+        }
         vehiculos = new HashMap<>();
         setValoresAgentes(aids);
         bateriaGlobal = 10000;
@@ -46,7 +48,11 @@ public class Mapa {
         vehiculos = new HashMap<>();
         miDimension = 10;
         matriz = new int[miDimension][miDimension];
-        Arrays.fill(matriz, DESCONOCIDO);
+        for(int i = 0; i < miDimension; i++){
+            for (int j = 0; j < miDimension; j++){
+                matriz[i][j] = DESCONOCIDO;
+            }
+        }
         setValoresAgentes(aids);
         bateriaGlobal = 10000;
     }
@@ -142,9 +148,9 @@ public class Mapa {
         }
         
         if(percepcion.get("sensor") != null){
-            int contador = 0;
             JsonArray json = percepcion.get("sensor").asArray();
             ArrayList<Integer> miRadar = new ArrayList(json.size());
+            int contador = 0;
             for (JsonValue j : json){
                 miRadar.add(contador, j.asInt());
                 contador++;
@@ -160,7 +166,6 @@ public class Mapa {
                     if( value == OBJETIVO){
                         this.objetivo = new Posicion(i,j);
                     }
-                    //System.out.println(pos); //borrar luego
                     set(new Posicion(i,j), miRadar.get(contador));
                 }
                 contador++;
@@ -361,7 +366,7 @@ public class Mapa {
         int puntosSW=0;
         int puntosS=0;
         
-        int [] puntos = new int[8];
+        int [] puntos = new int[9];
         //Miramos norte
         for(int i=0; i<rango+5; i++){
              if(get(x,y-i)==CELDA_LIBRE){
@@ -374,6 +379,7 @@ public class Mapa {
                 puntosN=puntosN-1000;
             }
         }
+        puntos[1] = puntosN;
         
         for(int i=0; i<rango+5; i++){
             if(get(x+i,y-i)==CELDA_LIBRE){
@@ -386,7 +392,9 @@ public class Mapa {
                puntosNE=puntosNE-1000;
            }
         }
-         for(int i=0; i<rango+5; i++){
+        puntos[2] = puntosNE;
+        
+        for(int i=0; i<rango+5; i++){
             if(get(x-i,y-i)==CELDA_LIBRE){
                puntosNW++;
            }
@@ -397,7 +405,7 @@ public class Mapa {
                puntosNW=puntosNW-1000;
            }
         }
-        
+        puntos[0] = puntosNW;
         for(int i=0; i<rango+5; i++){
              if(get(x,y+i)==CELDA_LIBRE){
                 puntosS++;
@@ -409,30 +417,32 @@ public class Mapa {
                 puntosS=puntosS-1000;
             }
         }
+        puntos[7] = puntosS;
         
-         for(int i=0; i<rango+5; i++){
+        for(int i=0; i<rango+5; i++){
             if(get(x+i,y+i)==CELDA_LIBRE){
-               puntosSE++;
-           }
-           else if(get(x+i,y+i)==DESCONOCIDO){
-               puntosSE=puntosSE+10;
-           }
-           else if(checkObstaculo(new Posicion(x+i,y+i), fly)){
-               puntosSE=puntosSE-1000;
-           }
+              puntosSE++;
+            }
+            else if(get(x+i,y+i)==DESCONOCIDO){
+                puntosSE=puntosSE+10;
+            }
+            else if(checkObstaculo(new Posicion(x+i,y+i), fly)){
+                puntosSE=puntosSE-1000;
+            }
         }
-         for(int i=0; i<rango+5; i++){
+        puntos[8] = puntosSE;
+        for(int i=0; i<rango+5; i++){
             if(get(x-i,y+i)==CELDA_LIBRE){
-               puntosSW++;
-           }
-           else if(get(x-i,y+i)==DESCONOCIDO){
-               puntosSW=puntosSW+10;
-           }
-           else if(checkObstaculo(new Posicion(x-i,y+i), fly)){
-               puntosSW=puntosSW-1000;
-           }
-        }
-        
+                puntosSW++;
+              }
+             else if(get(x-i,y+i)==DESCONOCIDO){
+                puntosSW=puntosSW+10;
+            }
+            else if(checkObstaculo(new Posicion(x-i,y+i), fly)){
+                puntosSW=puntosSW-1000;
+            }
+        }    
+        puntos[6] = puntosSW;
         for(int i=0; i<rango+5; i++){
              if(get(x+i,y)==CELDA_LIBRE){
                 puntosE++;
@@ -444,7 +454,8 @@ public class Mapa {
                 puntosE=puntosE-1000;
             }
         }
-         for(int i=0; i<rango+5; i++){
+        puntos[5] = puntosE;
+        for(int i=0; i<rango+5; i++){
              if(get(x-i,y)==CELDA_LIBRE){
                 puntosW++;
             }
@@ -455,6 +466,7 @@ public class Mapa {
                 puntosW= puntosW-1000;
             }
         }
+<<<<<<< HEAD
          
          if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW ){
              mov=Movs.MOV_S;
@@ -471,63 +483,24 @@ public class Mapa {
        
              
        
+=======
+        puntos[5] = puntosW;
+>>>>>>> e610a8411837a8519377854df9721e778ac6532c
         
+        puntos[4] = 0;
         
+        int max = 0;
+        for(int i =0 ; i < 8; i ++){
+            if(puntos[i] > puntos[max]){
+                max = i;
+            }
+        }
         
+        mov = Movs.intToString(max);
         
         return mov;
             
            
-        /*
-        int maxDesconocidas = -1;
-        String mov = Movs.MOV_NW;
-        int offset = 1;
-        Posicion supIzq = new Posicion(posActual);
-        supIzq.x -= offset;
-        supIzq.x -= offset;
-        Posicion pos = new Posicion(supIzq);
-        
-        int desconocidas;
-        int contador = 0;
-        int max_cont = -1;
-        System.out.println("Posicion actual" + posActual.toString() + " rango: "+ rango);
-        ArrayList<Integer> no_visitados = new ArrayList();
-        ArrayList<Integer> con_muro = new ArrayList();
-        
-        for(int i = 0 ; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                if(checkObstaculo(pos, fly)){
-                    if(!checkVisitada(pos, aid)){
-                        no_visitados.add(contador);
-                    }
-                    if( no_visitados.isEmpty() && con_muro.isEmpty()){
-                        if( casillaJuntoAMuro(pos)){
-                            con_muro.add(contador);
-                        }
-                    }
-                }
-                pos.x++;
-                
-            }
-            pos.x = supIzq.x;
-            pos.y++;
-            contador++;
-        }
-        // Transforma el entero en la orden String
-        if( casillasPorDescubrir(posActual, rango) > (rango*rango/2)){
-            mov = Movs.PERCEIVE;
-        }else{
-            if(no_visitados.isEmpty()){
-                if (!con_muro.isEmpty())
-                    mov = Movs.intToString(con_muro.get(0));
-                
-            }else
-                mov = Movs.intToString(no_visitados.get(0));
-            
-        }
-        
-        return mov;
-        */
     }
     
     /*
