@@ -33,7 +33,11 @@ public class Mapa {
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
         matriz = new int[miDimension][miDimension];
-        Arrays.fill(matriz, DESCONOCIDO);
+        for(int i = 0; i < miDimension; i++){
+            for (int j = 0; j < miDimension; j++){
+                matriz[i][j] = DESCONOCIDO;
+            }
+        }
         vehiculos = new HashMap<>();
         setValoresAgentes(aids);
         bateriaGlobal = 10000;
@@ -44,7 +48,11 @@ public class Mapa {
         vehiculos = new HashMap<>();
         miDimension = 10;
         matriz = new int[miDimension][miDimension];
-        Arrays.fill(matriz, DESCONOCIDO);
+        for(int i = 0; i < miDimension; i++){
+            for (int j = 0; j < miDimension; j++){
+                matriz[i][j] = DESCONOCIDO;
+            }
+        }
         setValoresAgentes(aids);
         bateriaGlobal = 10000;
     }

@@ -13,8 +13,8 @@ public class Main {
 
     public static void main(String[] args) {
         Administrador admin;
-        String jefe = "MasterMindddd";
-        String subdito = "peasantttt-";
+        String jefe = "MasterM";
+        String subdito = "peasant-";
         
         ////////////////////////////////////////////
         // No hacer push a los datos del grupo
