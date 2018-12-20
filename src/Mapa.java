@@ -76,12 +76,12 @@ public class Mapa {
             return OUT_OF_BOUNDS;
         }
     }
-    public void set(int x, int y, int val)throws IndexOutOfBoundsException{
-        if ( x < miDimension && y < miDimension && x >= 0 && y >= 0){
-            matriz[x][y] = val;
-        }else if ( x > miDimension || y > miDimension){
+    public void set(Posicion pos, int val)throws IndexOutOfBoundsException{
+        if ( pos.x < miDimension && pos.y < miDimension && pos.x >= 0 && pos.y >= 0){
+            matriz[pos.x][pos.y] = val;
+        }else if ( pos.x > miDimension || pos.y > miDimension){
             redimensionar(miDimension*2);
-            matriz[x][y] = val;
+            matriz[pos.x][pos.y] = val;
         }
     }
     
@@ -142,34 +142,28 @@ public class Mapa {
         }
         
         if(percepcion.get("sensor") != null){
-            int i = 0;
+            int contador = 0;
             JsonArray json = percepcion.get("sensor").asArray();
             ArrayList<Integer> miRadar = new ArrayList(json.size());
             for (JsonValue j : json){
-                miRadar.add(i, j.asInt());
-                i++;
+                miRadar.add(contador, j.asInt());
+                contador++;
             }
             int tam = (int) Math.floor( Math.sqrt(json.size()) );
             int offset = (tam-1)/2;
-            Posicion topleft = new Posicion();
-            topleft.x = posActual.x - offset;
-            topleft.y = posActual.y - offset;
+            Posicion topleft = new Posicion(posActual.x-offset, posActual.y-offset);
 
-            Posicion pos = new Posicion(topleft.x, topleft.y);
-            i = 0;
-            for(int k = 0 ; k < tam; k++){
-                for(int j = 0; j < tam ; j++){
-                    int value = miRadar.get(i);
+            contador = 0;
+            for(int i = topleft.x ; i < tam; i++){
+                for(int j = topleft.y; j < tam ; j++){
+                    int value = miRadar.get(contador);
                     if( value == OBJETIVO){
-                        this.objetivo = new Posicion(pos);
+                        this.objetivo = new Posicion(i,j);
                     }
                     //System.out.println(pos); //borrar luego
-                    set(pos.x, pos.y, miRadar.get(i));
-                    pos.x++;
+                    set(new Posicion(i,j), miRadar.get(contador));
                 }
-                pos.x = topleft.x;
-                pos.y++;
-                i++;
+                contador++;
             }
             //System.out.println("Contadas:" + i);
         }
@@ -264,14 +258,30 @@ public class Mapa {
         return movimiento;
     }
     
+        /*
+    * @brief Comprueba si la casilla es un obstaculo
+    * @author Sergio López Ayala
+    * @param pos posición a consultar
+    * @param fly capacidad del agente de sobrevolarlo
+    * @return boolean true si la casilla es un obstaculo, false si no lo es
+    */
     public boolean checkObstaculo(Posicion pos, boolean fly){
         int value = get(pos);
+        boolean no_pasable = ( value == BORDE_DEL_MUNDO || value == VEHICULO);
+        
         if(fly)
-            return( value != BORDE_DEL_MUNDO && value != VEHICULO);
+            return no_pasable;
         else
-            return ( value != OBSTACULO && value != BORDE_DEL_MUNDO && value != VEHICULO);
+            return (no_pasable || ( value == OBSTACULO));
     }
     
+    /*
+    * @brief Comprueba si un agente ha estado en una casilla
+    * @author Sergio López Ayala
+    * @param pos posición a consultar
+    * @param id identificador del agente
+    * @return boolean true si la ha vistado, false si no la ha vistado.
+    */
     public boolean checkVisitada(Posicion pos, AgentID id){
         return (get(pos) == valor_en_Mapa.get(id.getLocalName()));
     }
@@ -415,24 +425,25 @@ public class Mapa {
         return mov;
         */
     }
-    private int casillasPorDescubrir(Posicion posActual, int rango){
+    
+    /*
+    * @author Sergio López Ayala
+    * @brief Cuenta las casillas cercanas desconocidas
+    * @param rango define la distancia de casillas posibles a descubrir
+    * @param pos posición a consultar
+    */
+    private int casillasPorDescubrir(Posicion pos, int rango){
         int casillasDesconocidas = 0;
         
         int offset = (rango-1)/2;
-        Posicion supIzq = new Posicion(posActual);
-        supIzq.x -= offset;
-        supIzq.x -= offset;
-        Posicion pos = new Posicion(supIzq);
+        Posicion supIzq = new Posicion(pos.x-offset, pos.y-offset);
         
-        for(int i = 0 ; i < rango; i++){
-            for(int j = 0; j < rango; j++){
+        for(int i = supIzq.x ; i < rango; i++){
+            for(int j = supIzq.y; j < rango; j++){
                 if( get(pos) == DESCONOCIDO){
                     casillasDesconocidas++;
                 }
-                pos.x++;
             }
-            pos.x = supIzq.x;
-            pos.y++;
         }
         return casillasDesconocidas;
     }
