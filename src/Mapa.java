@@ -23,9 +23,8 @@ public class Mapa {
     public static final int DESCONOCIDO = 5;
     public static final int OUT_OF_BOUNDS = 6;
     
-    private int[] matriz;
+    private int[][] matriz;
     private int miDimension; //10 = 10x10
-    private int nCeldas;
     private int bateriaGlobal;
     private boolean finalEncontrado;
     Posicion objetivo;
@@ -35,15 +34,24 @@ public class Mapa {
     
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
-        nCeldas = miDimension*miDimension;
-        matriz = new int[nCeldas];
+        matriz = new int[miDimension][miDimension];
         Arrays.fill(matriz, DESCONOCIDO);
         vehiculos = new HashMap<>();
         setValoresAgentes(aids);
         bateriaGlobal = 10000;
     }
     
-    private void setValoresAgentes(ArrayList<AgentID> aids){
+ 
+    public Mapa(ArrayList<AgentID> aids){
+        vehiculos = new HashMap<>();
+        miDimension = 10;
+        matriz = new int[miDimension][miDimension];
+        Arrays.fill(matriz, DESCONOCIDO);
+        setValoresAgentes(aids);
+        bateriaGlobal = 10000;
+    }
+    
+       private void setValoresAgentes(ArrayList<AgentID> aids){
         int i = 7;
         valor_en_Mapa = new HashMap<>();
         for(AgentID aid: aids){
@@ -52,146 +60,58 @@ public class Mapa {
             i++;
         }
     }
-    public Mapa(ArrayList<AgentID> aids){
-        vehiculos = new HashMap<>();
-        miDimension = 10;
-        nCeldas = miDimension*miDimension;
-        matriz = new int[nCeldas];
-        Arrays.fill(matriz, DESCONOCIDO);
-        setValoresAgentes(aids);
-        bateriaGlobal = 10000;
-    }
     
     public int get(int x, int y)throws IndexOutOfBoundsException{
         if ( x < miDimension && y < miDimension && x >= 0 && y >= 0){
-            return(matriz[x*miDimension+y]);
+            return(matriz[x][y]);
         }else{
             return OUT_OF_BOUNDS;
         }
     }
     
-    public int get(int i)throws IndexOutOfBoundsException{
-        if( i < nCeldas){
-            return matriz[i];
-        }else{
-            throw new IndexOutOfBoundsException();
-        }
-    }
     public int get(Posicion pos){
         if ( pos.x < miDimension && pos.y< miDimension && pos.x >= 0 && pos.y >= 0){
-            return(matriz[pos.x*miDimension+pos.y]);
+            return(matriz[pos.x][pos.y]);
         }else{
             return OUT_OF_BOUNDS;
         }
     }
     public void set(int x, int y, int val)throws IndexOutOfBoundsException{
         if ( x < miDimension && y < miDimension && x >= 0 && y >= 0){
-            matriz[x*miDimension+y] = val;
+            matriz[x][y] = val;
         }else if ( x > miDimension || y > miDimension){
             redimensionar(miDimension*2);
-            matriz[x*miDimension+y] = val;
+            matriz[x][y] = val;
         }
     }
     
     public void redimensionar(int nuevaDimension){
         if(nuevaDimension > miDimension){
-            int nuevasCeldas = nuevaDimension*nuevaDimension;
-            int[] nuevaMatriz = new int[nuevasCeldas];
-            Arrays.fill(nuevaMatriz, DESCONOCIDO);
+            int[][] nuevaMatriz = new int[nuevaDimension][nuevaDimension];
             
-            int offset = 0;
-            for(int i = 0; i < nCeldas; i++){
-                if(i%miDimension == 0){
-                    offset = i%miDimension;
-                    offset *= (nuevaDimension-miDimension);
+            //Rellenamos de casillas desconocidas
+            for(int i = 0; i < nuevaDimension; i++){
+                for(int j = 0; j < nuevaDimension; j++){
+                    nuevaMatriz[i][j] = DESCONOCIDO;
                 }
-                nuevaMatriz[i + offset] = matriz[i];
-                
             }
+            
+            for(int i = 0; i < miDimension;i++){
+                for(int j = 0; j < miDimension; j++){
+                    nuevaMatriz[i][j] = matriz[i][j];
+                }
+            }
+            
             matriz = nuevaMatriz;
             miDimension = nuevaDimension;
-            nCeldas = nuevasCeldas;
         }
     }
     
     public int getDimension(){
         return miDimension;
     }
-    public int getCeldas(){
-        return nCeldas;
-    }
-    
     public boolean checkRefuel(){
         return (bateriaGlobal > 0);
-    }
-    
-    public ArrayList<ValorRLE> compresionRLE(){
-        ArrayList<ValorRLE> mapaComprimido = new ArrayList<>();
-        int anterior = matriz[0];
-        int repeticiones = 0;
-        for(int i = 0; i < nCeldas; i++){
-            if(anterior == matriz[i]){
-                repeticiones++;
-            }else{
-                mapaComprimido.add(new ValorRLE(anterior,repeticiones));
-                anterior = matriz[i];
-                repeticiones = 1;
-            }
-        }
-        mapaComprimido.add(new ValorRLE(anterior,repeticiones));
-        
-        return mapaComprimido;
-    }
-    
-    public void descompresionRLE(ArrayList<ValorRLE> mapaComprimido){
-        int veces = 0;
-        for(int i = 0 ; i < mapaComprimido.size(); i++){
-            veces+= mapaComprimido.get(i).veces;
-        }
-        
-        if( nCeldas < veces){
-            redimensionar((int) Math.sqrt(veces));
-        }
-        
-        int nuevaMatriz[] = new int[veces];
-        int indice = 0;
-        for(int i = 0 ; i < mapaComprimido.size(); i++){
-            ValorRLE valor = mapaComprimido.get(i);
-            for(int j = 0; j < valor.veces; j++, indice++)
-                nuevaMatriz[indice] = valor.valor;
-        }
-        
-        for(int i = 0 ; i < nCeldas ; i++){
-            if(nuevaMatriz[i] == DESCONOCIDO && matriz[i] != DESCONOCIDO){
-                nuevaMatriz[i] = matriz[i];
-            }
-        }
-        matriz = nuevaMatriz;
-        nCeldas = veces;
-        miDimension = (int) Math.sqrt(veces);
-    }
-   
-    @Override
-    public boolean equals(Object obj){
-        if (obj == null)
-                return false;
-            if (obj == this)
-                return true;
-            if (!(obj instanceof Mapa))
-                return false;
-            Mapa other = (Mapa)obj;
-            if(miDimension == other.getDimension()){
-                boolean exito = true;
-                for(int i = 0; i < nCeldas;i++){
-                    if(matriz[i] != other.get(i)){
-                        exito = false;
-                    }
-                }
-                return exito;
-            }else{
-                return false;
-            }
-            
     }
 
     public Posicion getPosicionVehiculo(AgentID aid){
@@ -271,29 +191,7 @@ public class Mapa {
         
         return objetivo_encontrado;
     }
-    
-    public JsonObject toJson(){
-        JsonObject json = new JsonObject();
-        ArrayList<ValorRLE> lista = compresionRLE();
-        JsonArray vector = new JsonArray();
-        for (Iterator<ValorRLE> iterator = lista.iterator(); iterator.hasNext();) {
-            ValorRLE next = iterator.next();
-            vector.add(next.valor);
-            vector.add(next.veces);
-        }
-        
-        return json;
-    }
-    
-    
-    public void parseJson(JsonArray arr){
-        ArrayList<ValorRLE> lista = new ArrayList();
-        for(int i = 0; i < arr.size(); i+= 2){
-            lista.add(new ValorRLE(arr.get(i).toString().charAt(0), arr.get(i+1).asInt()));
-        }
-        
-        descompresionRLE(lista);
-    }
+
     
     public Posicion siguientePosicion(Posicion actual, String mov){
         Posicion sig = actual;
@@ -416,29 +314,24 @@ public class Mapa {
         
         return mov;
     }
+    
+    /*
+    * Comprueba si la posición no es un muro y tiene alrededor al menos un obstaculo
+    */
     public boolean casillaJuntoAMuro(Posicion pos){
-        Posicion otra = new Posicion(pos);
-        otra.x -= 1;
-        otra.y -= 1;
+        boolean casilla = true;
         
-        if( !checkObstaculo(pos, false)){
-            return false; // es un muro
-        }
-        for(int i = 0 ; i < 3 ; i++){
-            for(int j = 0; j < 3; j++){
-                if( !pos.equals(otra)){
-                    if( !checkObstaculo(otra, false)){
-                        return true; // pos no es muro y otra si es muro
-                    }
+        if( checkObstaculo(pos, false)){
+            casilla = false;
+        }else{
+            for(int i = pos.x; i < 3; i++){
+                for(int j = pos.y; j < 3 ; j++){
+                    if( get(i,j) == OBSTACULO)
+                        casilla = true;
                 }
-                    
-                otra.x++;
             }
-            
-            otra.x = pos.x;
-            otra.y++;
         }
-        return false;
+        return casilla;
     }
     
     public String checkCercania(Posicion posActual, int rango,AgentID aid, boolean fly){
@@ -519,7 +412,6 @@ public class Mapa {
         int hash = 7;
         hash = 59 * hash + Arrays.hashCode(this.matriz);
         hash = 59 * hash + this.miDimension;
-        hash = 59 * hash + this.nCeldas;
         return hash;
     }
     public class ValorRLE{
@@ -552,15 +444,5 @@ public class Mapa {
             return hash;
         }
     }
-    
-    public void show(){
-        
-        for(int i = 0; i < nCeldas; i++){
-            for(int j = 0; j < miDimension; j++){
-                System.out.print(get(i));
-            }
-            System.out.println("");
-        }
 
-    }
 }
