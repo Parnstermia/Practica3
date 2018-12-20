@@ -468,10 +468,7 @@ public class Mapa {
          else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
              mov=Movs.MOV_W;
          }
-         else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
-             mov=Movs.MOV_W;
-         }
-         
+       
              
        
         
