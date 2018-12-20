@@ -88,10 +88,8 @@ public class Administrador extends SingleAgent{
                     enviarMensaje(objeto, new AgentID(host), performative, null);
                     exito = recibirMensaje();
                     if(exito){
-                        System.out.println("\nExito en el subscribe\nClave de sesión: " + conversationID);
                         estado = ESTADO_CHECK;
                     }else{
-                        System.out.println("Fallo en el subscribe");
                         ejecutar = false;
                     }
                     break;
@@ -100,7 +98,6 @@ public class Administrador extends SingleAgent{
                     objeto = new JsonObject();
                     objeto.add("orden", "checkin");
                     
-                    System.out.println("NUMERO de agentes: " + agentes.size());
                     for(AgentID id: agentes){
                         enviarMensaje(objeto, id, performative, inReplyTo);
                         recibirMensaje();
@@ -122,18 +119,16 @@ public class Administrador extends SingleAgent{
                         contador++; // borrar luego
                         agente = agentes.get(i);
                         tipo = tipos.get(agente.getLocalName());
-                        System.out.println(agente.getLocalName() + ", bateria :" + baterias.get(agente.getLocalName()));
+                        System.out.println(agente.getLocalName() + ", bateria :" + baterias.get(agente.getLocalName()).intValue());
                         
                         if(baterias.get(agente.getLocalName()).intValue() < 5){
                             objeto = new JsonObject();
-                            System.out.println("RECARGAMOS");
                             
                             if( mapa.checkRefuel())
                                 movimiento = Movs.REFUEL;
                             else
                                 movimiento = Movs.ESPERA;
                             
-                            System.out.println("Solicitud refuel o espera");
                             
                             objeto.add("orden", movimiento);
                             performative = ACLMessage.REQUEST;
@@ -171,6 +166,9 @@ public class Administrador extends SingleAgent{
                         }catch(Exception e){}
                     }
                     
+                    if(contador %100 == 0){
+                        mapa.incrementarZoom();
+                    }
                     
                     break;
                 case ESTADO_ENCONTRADO:
