@@ -6,8 +6,6 @@ import es.upv.dsic.gti_ia.core.AgentID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Collection;
 import java.util.Stack;
 
 /**
@@ -142,9 +140,9 @@ public class Mapa {
         }
         
         if(percepcion.get("sensor") != null){
-            int contador = 0;
             JsonArray json = percepcion.get("sensor").asArray();
             ArrayList<Integer> miRadar = new ArrayList(json.size());
+            int contador = 0;
             for (JsonValue j : json){
                 miRadar.add(contador, j.asInt());
                 contador++;
@@ -160,7 +158,6 @@ public class Mapa {
                     if( value == OBJETIVO){
                         this.objetivo = new Posicion(i,j);
                     }
-                    //System.out.println(pos); //borrar luego
                     set(new Posicion(i,j), miRadar.get(contador));
                 }
                 contador++;
