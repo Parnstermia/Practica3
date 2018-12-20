@@ -31,7 +31,7 @@ public class Mapa {
     private HashMap<String, Integer> valor_en_Mapa;
     private HashMap<String, Boolean> necesita_percepcion;
     
-    private int incrementarRango = 0;
+    private int zoom = 0; //amplia el rango en la exploración
     
     public Mapa(int dimension, ArrayList<AgentID> aids){
         miDimension = dimension;
@@ -272,6 +272,7 @@ public class Mapa {
         return movimiento;
     }
     
+    
         /*
     * @brief Comprueba si la casilla es un obstaculo
     * @author Sergio López Ayala
@@ -361,7 +362,6 @@ public class Mapa {
     }
     
     public String checkCercania(Posicion posActual, int rango,AgentID aid, boolean fly){
-        //NOrte sumas Y, Este Sumas X
          // Miramos Norte
          
         String mov =Movs.MOV_E;
@@ -378,8 +378,9 @@ public class Mapa {
         int puntosS=0;
         
         int [] puntos = new int[9];
+        int rangoAmpliado = rango + zoom;
         //Miramos norte
-        for(int i=0; i<rango+5; i++){
+        for(int i=0; i<rangoAmpliado; i++){
              if(get(x,y-i)==CELDA_LIBRE){
                 puntosN++;
             }
@@ -387,12 +388,12 @@ public class Mapa {
                 puntosN=puntosN+10;
             }
             else if(checkObstaculo(new Posicion(x,y-i), fly)){
-                puntosN=puntosN-1000;
+                puntosN=puntosN-20;
             }
         }
         puntos[1] = puntosN;
         
-        for(int i=0; i<rango+5; i++){
+        for(int i=0; i<rangoAmpliado; i++){
             if(get(x+i,y-i)==CELDA_LIBRE){
                puntosNE++;
            }
@@ -400,12 +401,12 @@ public class Mapa {
                puntosNE=puntosNE+10;
            }
            else if(checkObstaculo(new Posicion(x+i,y-i), fly)){
-               puntosNE=puntosNE-1000;
+               puntosNE=puntosNE-20;
            }
         }
         puntos[2] = puntosNE;
         
-        for(int i=0; i<rango+5; i++){
+        for(int i=0; i<rangoAmpliado; i++){
             if(get(x-i,y-i)==CELDA_LIBRE){
                puntosNW++;
            }
@@ -413,11 +414,12 @@ public class Mapa {
                puntosNW=puntosNW+10;
            }
            else if(checkObstaculo(new Posicion(x-i,y-i), fly)){
-               puntosNW=puntosNW-1000;
+               puntosNW=puntosNW-20;
            }
         }
         puntos[0] = puntosNW;
-        for(int i=0; i<rango+5; i++){
+        
+        for(int i=0; i<rangoAmpliado; i++){
              if(get(x,y+i)==CELDA_LIBRE){
                 puntosS++;
             }
@@ -425,12 +427,12 @@ public class Mapa {
                 puntosS=puntosS+10;
             }
             else if(checkObstaculo(new Posicion(x,y+i), fly)){
-                puntosS=puntosS-1000;
+                puntosS=puntosS-20;
             }
         }
         puntos[7] = puntosS;
         
-        for(int i=0; i<rango+5; i++){
+        for(int i=0; i<rangoAmpliado; i++){
             if(get(x+i,y+i)==CELDA_LIBRE){
               puntosSE++;
             }
@@ -438,11 +440,12 @@ public class Mapa {
                 puntosSE=puntosSE+10;
             }
             else if(checkObstaculo(new Posicion(x+i,y+i), fly)){
-                puntosSE=puntosSE-1000;
+                puntosSE=puntosSE-20;
             }
         }
         puntos[8] = puntosSE;
-        for(int i=0; i<rango+5; i++){
+        
+        for(int i=0; i<rangoAmpliado; i++){
             if(get(x-i,y+i)==CELDA_LIBRE){
                 puntosSW++;
               }
@@ -450,11 +453,12 @@ public class Mapa {
                 puntosSW=puntosSW+10;
             }
             else if(checkObstaculo(new Posicion(x-i,y+i), fly)){
-                puntosSW=puntosSW-1000;
+                puntosSW=puntosSW-20;
             }
         }    
         puntos[6] = puntosSW;
-        for(int i=0; i<rango+5; i++){
+        
+        for(int i=0; i<rangoAmpliado; i++){
              if(get(x+i,y)==CELDA_LIBRE){
                 puntosE++;
             }
@@ -462,25 +466,25 @@ public class Mapa {
                 puntosE=puntosE+10;
             }
             else if(checkObstaculo(new Posicion(x+i,y), fly)){
-                puntosE=puntosE-1000;
+                puntosE=puntosE-20;
             }
         }
         puntos[5] = puntosE;
-        for(int i=0; i<rango+5; i++){
+        
+        for(int i=0; i<rangoAmpliado; i++){
              if(get(x-i,y)==CELDA_LIBRE){
                 puntosW++;
             }
             else if(get(x-i,y)==DESCONOCIDO ){
                 puntosW=puntosW+10;
             }
-            else if(checkObstaculo(new Posicion(x+i,y), fly)){
-                puntosW= puntosW-1000;
+            else if(checkObstaculo(new Posicion(x-i,y), fly)){
+                puntosW= puntosW-20;
             }
         }
-
         puntos[3] = puntosW;
         
-        puntos[4] = 0;
+        puntos[4] = -5000000;
         
         int max = 0;
         for(int i =0 ; i < 9; i ++){
@@ -495,7 +499,7 @@ public class Mapa {
             mov = Movs.intToString(max);
             while( checkObstaculo(siguientePosicion(posActual, mov),fly) ){
                 
-                puntos[max] = -1111111;
+                puntos[max] = -500000;
                 max = 0;
                 for(int i =0 ; i < 9; i ++){
                     if(puntos[i] > puntos[max]){
@@ -541,6 +545,10 @@ public class Mapa {
         hash = 59 * hash + Arrays.hashCode(this.matriz);
         hash = 59 * hash + this.miDimension;
         return hash;
+    }
+
+    void incrementarZoom() {
+        zoom++;
     }
     
 }
