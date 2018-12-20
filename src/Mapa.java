@@ -466,7 +466,7 @@ public class Mapa {
                 puntosW= puntosW-1000;
             }
         }
-<<<<<<< HEAD
+
          
          if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW ){
              mov=Movs.MOV_S;
@@ -482,10 +482,8 @@ public class Mapa {
          }
        
              
-       
-=======
+
         puntos[5] = puntosW;
->>>>>>> e610a8411837a8519377854df9721e778ac6532c
         
         puntos[4] = 0;
         
