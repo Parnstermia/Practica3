@@ -371,6 +371,7 @@ public class Mapa {
                 puntosN=puntosN-1000;
             }
         }
+        puntos[1] = puntosN;
         
         for(int i=0; i<rango+5; i++){
             if(get(x+i,y-i)==CELDA_LIBRE){
@@ -383,7 +384,9 @@ public class Mapa {
                puntosNE=puntosNE-1000;
            }
         }
-         for(int i=0; i<rango+5; i++){
+        puntos[2] = puntosNE;
+        
+        for(int i=0; i<rango+5; i++){
             if(get(x-i,y-i)==CELDA_LIBRE){
                puntosNW++;
            }
@@ -394,7 +397,7 @@ public class Mapa {
                puntosNW=puntosNW-1000;
            }
         }
-        
+        puntos[0] = puntosNW;
         for(int i=0; i<rango+5; i++){
              if(get(x,y-i)==CELDA_LIBRE){
                 puntosS++;
@@ -406,6 +409,7 @@ public class Mapa {
                 puntosS=puntosS-1000;
             }
         }
+        puntos[6] = puntosS;
         for(int i=0; i<rango+5; i++){
              if(get(x+i,y)==CELDA_LIBRE){
                 puntosE++;
@@ -417,7 +421,8 @@ public class Mapa {
                 puntosE=puntosE-1000;
             }
         }
-         for(int i=0; i<rango+5; i++){
+        puntos[4] = puntosE;
+        for(int i=0; i<rango+5; i++){
              if(get(x-i,y)==CELDA_LIBRE){
                 puntosW++;
             }
@@ -428,25 +433,19 @@ public class Mapa {
                 puntosW= puntosW-1000;
             }
         }
-         
-         if(puntosS>puntosN && puntosS> puntosE && puntosS > puntosW){
-             mov=Movs.MOV_S;
-         }
-         else if(puntosN>puntosS && puntosN> puntosE && puntosN > puntosW){
-             mov=Movs.MOV_N;
-         }
-          else if(puntosE>puntosS && puntosE> puntosN && puntosE > puntosW){
-             mov=Movs.MOV_E;
-         }
-         else if(puntosW>puntosS && puntosW> puntosN && puntosW > puntosW){
-             mov=Movs.MOV_W;
-         }
-         
-             
-       
+        puntos[5] = puntosW;
+        puntos[3] = 0;
+        puntos[7] = 0;
         
         
+        int max = 0;
+        for(int i =0 ; i < 8; i ++){
+            if(puntos[i] > puntos[max]){
+                max = i;
+            }
+        }
         
+        mov = Movs.intToString(max);
         
         return mov;
             
